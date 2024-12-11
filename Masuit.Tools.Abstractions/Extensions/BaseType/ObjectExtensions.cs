@@ -33,7 +33,8 @@ namespace Masuit.Tools;
 /// </summary>
 public static class ObjectExtensions
 {
-    private static readonly MethodInfo CloneMethod = typeof(object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance);
+    private static readonly MethodInfo CloneMethod =
+        typeof(object).GetMethod("MemberwiseClone", BindingFlags.NonPublic | BindingFlags.Instance);
 
 #if NET5_0_OR_GREATER
     /// <summary>
@@ -79,7 +80,8 @@ public static class ObjectExtensions
         //IsPrimitive 判断是否为基础类型。
         //基元类型为 Boolean、 Byte、 SByte、 Int16、 UInt16、 Int32、 UInt32、 Int64、 UInt64、 IntPtr、 UIntPtr、 Char、 Double 和 Single。
         var t = Nullable.GetUnderlyingType(type) ?? type;
-        return t.IsPrimitive || t.IsEnum || t == typeof(decimal) || t == typeof(string) || t == typeof(Guid) || t == typeof(TimeSpan) || t == typeof(Uri);
+        return t.IsPrimitive || t.IsEnum || t == typeof(decimal) || t == typeof(string) || t == typeof(Guid) ||
+               t == typeof(TimeSpan) || t == typeof(Uri);
     }
 
     /// <summary>
@@ -100,7 +102,8 @@ public static class ObjectExtensions
     public static bool IsSimpleListType(this Type type)
     {
         type = Nullable.GetUnderlyingType(type) ?? type;
-        return type.IsGenericType && type.GetGenericArguments().Length == 1 && type.GetGenericArguments().FirstOrDefault().IsSimpleType();
+        return type.IsGenericType && type.GetGenericArguments().Length == 1 &&
+               type.GetGenericArguments().FirstOrDefault().IsSimpleType();
     }
 
     /// <summary>
@@ -161,7 +164,9 @@ public static class ObjectExtensions
     /// <returns></returns>
     public static T DeepClone<T>(this T original, bool useJson = false)
     {
-        return useJson ? InternalJsonCopy(original) : (T)InternalCopy(original, new Dictionary<object, object>(new ReferenceEqualityComparer()));
+        return useJson
+            ? InternalJsonCopy(original)
+            : (T)InternalCopy(original, new Dictionary<object, object>(new ReferenceEqualityComparer()));
     }
 
 #if NETSTANDARD2_1_OR_GREATER
@@ -213,7 +218,8 @@ public static class ObjectExtensions
             if (!IsPrimitive(arrayType))
             {
                 Array clonedArray = (Array)cloneObject;
-                clonedArray.ForEach((array, indices) => array.SetValue(InternalCopy(clonedArray.GetValue(indices), visited), indices));
+                clonedArray.ForEach((array, indices) =>
+                    array.SetValue(InternalCopy(clonedArray.GetValue(indices), visited), indices));
             }
         }
 
@@ -223,16 +229,21 @@ public static class ObjectExtensions
         return cloneObject;
     }
 
-    private static void RecursiveCopyBaseTypePrivateFields(object originalObject, IDictionary<object, object> visited, object cloneObject, Type typeToReflect)
+    private static void RecursiveCopyBaseTypePrivateFields(object originalObject, IDictionary<object, object> visited,
+        object cloneObject, Type typeToReflect)
     {
         if (typeToReflect.BaseType != null)
         {
             RecursiveCopyBaseTypePrivateFields(originalObject, visited, cloneObject, typeToReflect.BaseType);
-            CopyFields(originalObject, visited, cloneObject, typeToReflect.BaseType, BindingFlags.Instance | BindingFlags.NonPublic, info => info.IsPrivate);
+            CopyFields(originalObject, visited, cloneObject, typeToReflect.BaseType,
+                BindingFlags.Instance | BindingFlags.NonPublic, info => info.IsPrivate);
         }
     }
 
-    private static void CopyFields(object originalObject, IDictionary<object, object> visited, object cloneObject, IReflect typeToReflect, BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy, Func<FieldInfo, bool> filter = null)
+    private static void CopyFields(object originalObject, IDictionary<object, object> visited, object cloneObject,
+        IReflect typeToReflect,
+        BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public |
+                                    BindingFlags.FlattenHierarchy, Func<FieldInfo, bool> filter = null)
     {
         foreach (FieldInfo fieldInfo in typeToReflect.GetFields(bindingFlags))
         {
@@ -292,6 +303,7 @@ public static class ObjectExtensions
         if (obj == null) return string.Empty;
         return JsonConvert.SerializeObject(obj, setting);
     }
+
 
     /// <summary>
     /// json反序列化成对象
@@ -373,6 +385,7 @@ public static class ObjectExtensions
                 {
                     dictionary.Add(e.Key.ToString(), e.Value);
                 }
+
                 return dictionary;
             }
 
@@ -505,6 +518,7 @@ internal static class ArrayExtensions
             {
                 _maxLengths[i] = array.GetLength(i) - 1;
             }
+
             Position = new int[array.Rank];
         }
 
@@ -519,9 +533,11 @@ internal static class ArrayExtensions
                     {
                         Position[j] = 0;
                     }
+
                     return true;
                 }
             }
+
             return false;
         }
     }
